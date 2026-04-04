@@ -1,0 +1,51 @@
+using UnityEngine;
+using System.Collections.Generic;
+using System;
+
+public class CandlePuzzle : MonoBehaviour
+{
+    [Header("Puzzle Settings")]
+    public List<Candle> correctOrder = new();
+    private readonly List<Candle> playerInput = new();
+
+    public void CheckPuzzle()
+    {
+        for (int i = 0; i < correctOrder.Count; i++)
+        {
+            if (playerInput[i] != correctOrder[i])
+            {
+                ResetPuzzle();
+                return;
+            }
+        }
+        foreach (Candle candle in playerInput) {
+            candle.ChangeState(CandleStates.DONE);
+        }
+        // remove debug in post
+        Debug.Log("Puzzle Complete!!!!!!!!!!!!!!!");
+        // puzzle is complete, do stuff
+    }
+
+    public void ResetPuzzle()
+    {
+        // remove debug in post
+        Debug.Log("Wrong order! Resetting candles...");
+        foreach (Candle candle in playerInput)
+        {
+            candle.ChangeState(CandleStates.IDLE);
+        }
+        playerInput.Clear();
+    }
+
+    public void AddInupt(Candle candle)
+    {
+        if (playerInput.Contains(candle)) return; // error check just in incase
+        playerInput.Add(candle);
+
+        // check for puzzle completion once all candles have been lit
+        if(playerInput.Count == correctOrder.Count)
+        {
+            CheckPuzzle();
+        }
+    }
+}
