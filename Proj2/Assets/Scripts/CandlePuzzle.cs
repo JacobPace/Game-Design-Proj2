@@ -8,6 +8,8 @@ public class CandlePuzzle : MonoBehaviour
     public List<Candle> correctOrder = new();
     private readonly List<Candle> playerInput = new();
 
+    public GameObject escapeDoor;
+
     public void CheckPuzzle()
     {
         for (int i = 0; i < correctOrder.Count; i++)
@@ -24,6 +26,7 @@ public class CandlePuzzle : MonoBehaviour
         // remove debug in post
         Debug.Log("Puzzle Complete!!!!!!!!!!!!!!!");
         // puzzle is complete, do stuff
+        Destroy(escapeDoor);
     }
 
     public void ResetPuzzle()
