@@ -3,9 +3,10 @@ using UnityEngine;
 public class Book : MonoBehaviour, IInteractable
 {
     // Public vars
-    public FlashlightController playerFlashlight;
-    public bool used = false;
+    public GameObject playerFlashlight;
+    public NewFlashlight flashlightScript;
 
+    private bool used = false;
     public void Interact()
     {
 
@@ -16,8 +17,14 @@ public class Book : MonoBehaviour, IInteractable
         // give the player the flashlight
         if (playerFlashlight != null)
         {
-            playerFlashlight.UnlockFlashlight();
-            Debug.Log("Player grabbed book");
+            playerFlashlight.SetActive(true);
         }
+        
+        if (flashlightScript != null)
+        {
+            flashlightScript.UnlockFlashlight();
+        }
+
+        Debug.Log("You picked up the flashlight.");
     }
 }
