@@ -1,6 +1,9 @@
+using StarterAssets;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System;
 
 
 interface IInteractable
@@ -13,12 +16,16 @@ public class Interactor : MonoBehaviour
     public Transform InteractorSource;
     public float InteractRange;
     public LayerMask interactableLayer;
+    public GameObject reticle;
     private Sprite sprReticleOff;
     public Sprite sprReticleOn;
     public Image imgReticle;
+    public GameObject pauseMenu;
 
     private Color clrDefault;
     private Color clrHover = Color.cyan;
+
+    private StarterAssetsInputs _starterInputs;
 
     private Renderer lastRenderer;
     [ColorUsage(true, true)]
@@ -28,6 +35,12 @@ public class Interactor : MonoBehaviour
     {
         sprReticleOff = imgReticle.sprite;
         clrDefault = imgReticle.color;
+        
+    }
+
+    private void Start()
+    {
+        _starterInputs = UnityEngine.Object.FindFirstObjectByType<StarterAssetsInputs>();
     }
 
     void Update()
@@ -48,7 +61,7 @@ public class Interactor : MonoBehaviour
                     lastRenderer.material.SetColor("_EmissionColor", highlightColor);
                 }
 
-                if (Keyboard.current.eKey.wasPressedThisFrame)
+                if (PlayerInput.Instance.input.Interact.triggered)
                 {
                     if (hitInfo.collider.gameObject.TryGetComponent(out IInteractable interactObject))
                     {
@@ -61,6 +74,17 @@ public class Interactor : MonoBehaviour
         else
         {
             ResetOutline();
+        }
+        if (PlayerInput.Instance.input.Menu.triggered)
+        {
+            _starterInputs.cursorInputForLook = false;
+            //_starterInputs.SetCursorState(false);
+            PlayerInput.Instance.DisableInput();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            reticle.SetActive(false);
+            pauseMenu.SetActive(true);
+            Time.timeScale = 0;
         }
     }
 
