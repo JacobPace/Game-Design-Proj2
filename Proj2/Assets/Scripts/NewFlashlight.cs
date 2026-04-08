@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class NewFlashlight : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class NewFlashlight : MonoBehaviour
     {
         if (!hasFlashlight) return;
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame)
         {
             if (isON)
             {
