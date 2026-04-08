@@ -20,8 +20,6 @@ public class FlashlightReveal : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("FlashlightReveal running on " + gameObject.name);
-
         if (hiddenNumber == null || flashlight == null || flashlightTransform == null)
             return;
 
