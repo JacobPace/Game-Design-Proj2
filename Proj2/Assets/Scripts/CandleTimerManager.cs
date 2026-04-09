@@ -45,7 +45,7 @@ public class CandleTimerManager : MonoBehaviour
     {
         foreach (TimerCandle candle in timerCandles)
         {
-            yield return new WaitForSeconds(90f);
+            yield return new WaitForSeconds(60f);
             if (candle != null)
             {
                 candle.ExtinguishCandle();
