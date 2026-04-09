@@ -7,6 +7,9 @@ public class CandleTimerManager : MonoBehaviour
     public List<TimerCandle> timerCandles = new();
     public float secondsPerCandle = 180f; // 3 minutes
 
+    // Game Manager 
+    public GameManager gameManager;
+
     // Lose Condition
     public GameObject loseScreen;
     public bool gameOver = false;
@@ -75,6 +78,11 @@ public class CandleTimerManager : MonoBehaviour
         if (loseScreen != null)
         {
             loseScreen.SetActive(true);
+        }
+
+        if (gameManager != null)
+        {
+            gameManager.TimeRanOut();
         }
 
         Time.timeScale = 0f;

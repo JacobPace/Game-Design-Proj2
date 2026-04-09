@@ -8,6 +8,9 @@ public class CandlePuzzle : MonoBehaviour
     public List<Candle> correctOrder = new();
     private readonly List<Candle> playerInput = new();
 
+    [Header("Puzzle Settings")]
+    public GameManager gameManager;
+
     public DrawerAnimation drawerScript;
 
     public void CheckPuzzle()
@@ -25,6 +28,12 @@ public class CandlePuzzle : MonoBehaviour
         }
         // remove debug in post
         Debug.Log("Puzzle Complete!!!!!!!!!!!!!!!");
+
+        if (gameManager != null)
+        {
+            gameManager.RegisterPuzzleComplete();
+        }
+
         // puzzle is complete, do stuff
         if (drawerScript != null) {
             drawerScript.OpenDrawer();

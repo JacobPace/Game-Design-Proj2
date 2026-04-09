@@ -19,8 +19,6 @@ public class Candle : MonoBehaviour, IInteractable
     public Light candleLight;
     public CandlePuzzle puzzle;
 
-
-    
     void Start()
     {
         this.flame.Stop();

@@ -10,6 +10,9 @@ public class BookshelfPuzzle : MonoBehaviour
     // All Puzzle Books
     public List<ShelfBook> allBooks = new();
 
+    // Game Manager
+    public GameManager gameManager;
+
     // Reward
     public DoorOpener finalDoor;
     private bool solved = false;
@@ -63,6 +66,11 @@ public class BookshelfPuzzle : MonoBehaviour
         }
 
         Debug.Log("Bookshelf puzzle complete!");
+
+        if (gameManager != null)
+        {
+            gameManager.RegisterPuzzleComplete();
+        }
 
         if (finalDoor != null)
         {
