@@ -6,7 +6,7 @@ public class MainMenu : MonoBehaviour
     public GameObject infoScreen;
     public void StartGame()
     {
-        SceneManager.LoadScene("CandleTestScene");
+        SceneManager.LoadScene("LibraryTest");
     }
 
     public void InfoScreen()
