@@ -41,6 +41,8 @@ public class Interactor : MonoBehaviour
     private void Start()
     {
         _starterInputs = UnityEngine.Object.FindFirstObjectByType<StarterAssetsInputs>();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()

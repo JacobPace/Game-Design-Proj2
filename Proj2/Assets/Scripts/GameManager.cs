@@ -14,6 +14,7 @@ public enum GameStates
 }
 public class GameManager : MonoBehaviour
 {
+
     public State State { get; private set; }
     private HashSet<KeyValuePair<State, State>> allowedTransitions;
 
