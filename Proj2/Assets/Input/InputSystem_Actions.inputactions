@@ -45,8 +45,8 @@
                 {
                     "name": "Interact",
                     "type": "Button",
-                    "id": "30bd8653-bf04-4bd2-993a-681ea36030e8",
-                    "expectedControlType": "",
+                    "id": "852140f2-7766-474d-8707-702459ba45f3",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false

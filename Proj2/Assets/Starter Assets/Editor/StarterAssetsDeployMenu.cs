@@ -1,13 +1,12 @@
-using System;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
+#if STARTER_ASSETS_PACKAGES_CHECKED
 using Unity.Cinemachine;
+#endif
 
 namespace StarterAssets
 {
-    // This class needs to be a scriptable object to support dynamic determination of StarterAssets install path
     public partial class StarterAssetsDeployMenu : ScriptableObject
     {
         public const string MenuRoot = "Tools/Starter Assets";
@@ -24,131 +23,136 @@ namespace StarterAssets
         private const string MainCameraTag = "MainCamera";
         private const string CinemachineTargetTag = "CinemachineTarget";
 
+        // Get the path to the template prefabs
+        private static string StarterAssetsPath => PathToThisFile;
+
         private static GameObject _cinemachineVirtualCamera;
 
-        private static void CheckCameras(Transform targetParent, string prefabFolder)
+        public static string StarterAssetsInstallPath
         {
-            CheckMainCamera(prefabFolder);
+            get
+            {
+                string path = PathToThisFile;
+                return path.Substring(0, path.LastIndexOf("StarterAssets"));
+            }
+        }
+
+        private static string PathToThisFile
+        {
+            get
+            {
+                var dummy = CreateInstance<StarterAssetsDeployMenu>();
+                string path = AssetDatabase.GetAssetPath(MonoScript.FromScriptableObject(dummy));
+                DestroyImmediate(dummy);
+                return path.Substring(0, path.LastIndexOf("/Editor/StarterAssetsDeployMenu.cs"));
+            }
+        }
+
+        [MenuItem(MenuRoot + "/Reinstall Dependencies", false)]
+        static void ResetPackageChecker()
+        {
+            Debug.LogWarning("Package checker utilities not found in this project.");
+        }
+
+#if STARTER_ASSETS_PACKAGES_CHECKED
+        private static void CheckCameras(string prefabPath, Transform targetParent)
+        {
+            CheckMainCamera(prefabPath);
 
             GameObject vcam = GameObject.Find(CinemachineVirtualCameraName);
 
             if (!vcam)
             {
-                if (TryLocatePrefab(CinemachineVirtualCameraName, new string[]{prefabFolder}, new[] { typeof(CinemachineCamera) }, out GameObject vcamPrefab, out string _))
-                {
-                    HandleInstantiatingPrefab(vcamPrefab, out vcam);
-                    _cinemachineVirtualCamera = vcam;
-                }
-                else
-                {
-                    Debug.LogError("Couldn't find Cinemachine Virtual Camera prefab");
-                }
+                HandleInstantiatingPrefab(
+                    StarterAssetsPath + prefabPath,
+                    CinemachineVirtualCameraName,
+                    out GameObject vcamPrefab
+                );
+                _cinemachineVirtualCamera = vcamPrefab;
             }
             else
             {
                 _cinemachineVirtualCamera = vcam;
             }
 
-            GameObject[] targets = GameObject.FindGameObjectsWithTag(CinemachineTargetTag);
-            GameObject target = targets.FirstOrDefault(t => t.transform.IsChildOf(targetParent));
+            GameObject target = targetParent.Find("PlayerCameraRoot")?.gameObject;
+
             if (target == null)
             {
                 target = new GameObject("PlayerCameraRoot");
                 target.transform.SetParent(targetParent);
                 target.transform.localPosition = new Vector3(0f, 1.375f, 0f);
-                target.tag = CinemachineTargetTag;
                 Undo.RegisterCreatedObjectUndo(target, "Created new cinemachine target");
             }
 
             CheckVirtualCameraFollowReference(target, _cinemachineVirtualCamera);
         }
 
-        private static void CheckMainCamera(string inFolder)
+        private static void CheckMainCamera(string prefabPath)
         {
             GameObject[] mainCameras = GameObject.FindGameObjectsWithTag(MainCameraTag);
 
             if (mainCameras.Length < 1)
             {
-                // if there are no MainCameras, add one
-                if (TryLocatePrefab(MainCameraPrefabName, new string[]{inFolder}, new[] { typeof(CinemachineBrain), typeof(Camera) }, out GameObject camera, out string _))
-                {
-                    HandleInstantiatingPrefab(camera, out _);
-                }
-                else
-                {
-                    Debug.LogError("Couldn't find Starter Assets Main Camera prefab");
-                }
+                HandleInstantiatingPrefab(
+                    StarterAssetsPath + prefabPath,
+                    MainCameraPrefabName,
+                    out _
+                );
             }
             else
             {
-                // make sure the found camera has a cinemachine brain (we only need 1)
                 if (!mainCameras[0].TryGetComponent(out CinemachineBrain cinemachineBrain))
-                    mainCameras[0].AddComponent<CinemachineBrain>();
-            }
-        }
-
-        private static void CheckVirtualCameraFollowReference(GameObject target,
-            GameObject cinemachineVirtualCamera)
-        {
-            var serializedObject =
-                new SerializedObject(cinemachineVirtualCamera.GetComponent<CinemachineCamera>());
-            var serializedProperty = serializedObject.FindProperty("m_Follow");
-            serializedProperty.objectReferenceValue = target.transform;
-            serializedObject.ApplyModifiedProperties();
-        }
-
-        private static bool TryLocatePrefab(string name, string[] inFolders, System.Type[] requiredComponentTypes, out GameObject prefab, out string path)
-        {
-            // Locate the player armature
-            string[] allPrefabs = AssetDatabase.FindAssets("t:Prefab", inFolders);
-            for (int i = 0; i < allPrefabs.Length; ++i)
-            {
-                string assetPath = AssetDatabase.GUIDToAssetPath(allPrefabs[i]);
-                
-                if (assetPath.Contains("/com.unity.starter-assets/"))
                 {
-                    Object loadedObj = AssetDatabase.LoadMainAssetAtPath(assetPath);
-
-                    if (PrefabUtility.GetPrefabAssetType(loadedObj) != PrefabAssetType.NotAPrefab &&
-                        PrefabUtility.GetPrefabAssetType(loadedObj) != PrefabAssetType.MissingAsset)
-                    {
-                        GameObject loadedGo = loadedObj as GameObject;
-                        bool hasRequiredComponents = true;
-                        foreach (var componentType in requiredComponentTypes)
-                        {
-                            if (!loadedGo.TryGetComponent(componentType, out _))
-                            {
-                                hasRequiredComponents = false;
-                                break;
-                            }
-                        }
-
-                        if (hasRequiredComponents)
-                        {
-                             if (loadedGo.name == name)
-                             {
-                                 prefab = loadedGo;
-                                 path = assetPath;
-                                 return true;
-                             }                           
-                        }
-                    }
+                    mainCameras[0].AddComponent<CinemachineBrain>();
                 }
             }
-
-            prefab = null;
-            path = null;
-            return false;
         }
 
-        private static void HandleInstantiatingPrefab(GameObject prefab, out GameObject prefabInstance)
+        private static void CheckVirtualCameraFollowReference(GameObject target, GameObject cinemachineVirtualCamera)
         {
-            prefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            Undo.RegisterCreatedObjectUndo(prefabInstance, "Instantiate Starter Asset Prefab");
+            var virtualCamera = cinemachineVirtualCamera.GetComponent<CinemachineVirtualCamera>();
+            if (virtualCamera == null)
+            {
+                Debug.LogError("CinemachineVirtualCamera component not found.");
+                return;
+            }
 
-            prefabInstance.transform.localPosition = Vector3.zero;
-            prefabInstance.transform.localEulerAngles = Vector3.zero;
-            prefabInstance.transform.localScale = Vector3.one;
+            var serializedObject = new SerializedObject(virtualCamera);
+            var serializedProperty = serializedObject.FindProperty("m_Follow");
+
+            if (serializedProperty != null)
+            {
+                serializedProperty.objectReferenceValue = target.transform;
+                serializedObject.ApplyModifiedProperties();
+            }
+            else
+            {
+                Debug.LogError("Could not find m_Follow property on CinemachineVirtualCamera.");
+            }
         }
+
+        private static void HandleInstantiatingPrefab(string path, string prefabName, out GameObject prefab)
+        {
+            Object loadedPrefab = AssetDatabase.LoadAssetAtPath<Object>($"{path}{prefabName}.prefab");
+
+            if (loadedPrefab == null)
+            {
+                Debug.LogError($"Could not load prefab at path: {path}{prefabName}.prefab");
+                prefab = null;
+                return;
+            }
+
+            prefab = (GameObject)PrefabUtility.InstantiatePrefab(loadedPrefab);
+
+            if (prefab != null)
+            {
+                Undo.RegisterCreatedObjectUndo(prefab, "Instantiate Starter Asset Prefab");
+                prefab.transform.localPosition = Vector3.zero;
+                prefab.transform.localEulerAngles = Vector3.zero;
+                prefab.transform.localScale = Vector3.one;
+            }
+        }
+#endif
     }
 }

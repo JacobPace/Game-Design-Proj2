@@ -6,10 +6,6 @@ using UnityEngine.UI;
 using System;
 
 
-interface IInteractable
-{
-    public void Interact();
-}
 public class Interactor : MonoBehaviour
 {
     // set in inspector
@@ -31,11 +27,23 @@ public class Interactor : MonoBehaviour
     [ColorUsage(true, true)]
     public Color highlightColor = Color.white;
 
+    private MaterialPropertyBlock _propBlock;
+    private static readonly int EmissionColorID = Shader.PropertyToID("_EmissionColor");
+
     private void Awake()
     {
+        if (imgReticle == null)
+        {
+            Debug.LogError("Interactor: imgReticle is not assigned in the Inspector.");
+            return;
+        }
+
+
         sprReticleOff = imgReticle.sprite;
         clrDefault = imgReticle.color;
-        
+        _propBlock = new MaterialPropertyBlock();
+
+
     }
 
     private void Start()
@@ -60,7 +68,7 @@ public class Interactor : MonoBehaviour
                 {
                     ResetOutline();
                     lastRenderer = currentRenderer;
-                    lastRenderer.material.SetColor("_EmissionColor", highlightColor);
+                    SetEmission(lastRenderer, highlightColor);
                 }
 
                 if (PlayerInput.Instance.input.Interact.triggered)
@@ -90,11 +98,22 @@ public class Interactor : MonoBehaviour
         }
     }
 
+    void SetEmission(Renderer rend, Color color)
+    {
+        if (rend == null) return;
+
+        rend.GetPropertyBlock(_propBlock);
+        _propBlock.SetColor(EmissionColorID, color);
+        rend.SetPropertyBlock(_propBlock);
+    }
+
     void ResetOutline()
     {
         if (lastRenderer != null)
         {
-            lastRenderer.material.SetColor("_EmissionColor", Color.black);
+            lastRenderer.GetPropertyBlock(_propBlock);
+            _propBlock.SetColor(EmissionColorID, Color.black);
+            lastRenderer.SetPropertyBlock(_propBlock);
             lastRenderer = null;
         }
     }
