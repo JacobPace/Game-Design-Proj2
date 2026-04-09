@@ -79,6 +79,7 @@ public class Candle : MonoBehaviour, IInteractable
                 this.candleLight.enabled = true;
                 // play flame audio?
                 this.puzzle.AddInupt(this); // add current candle to player input check
+                SoundManager.Play(SoundType.CANDLE_ON);
                 break;
             case State.DONE:
                 //code

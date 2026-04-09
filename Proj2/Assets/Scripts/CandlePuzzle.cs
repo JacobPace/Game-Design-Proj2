@@ -49,6 +49,7 @@ public class CandlePuzzle : MonoBehaviour
             candle.ChangeState(CandleStates.IDLE);
         }
         playerInput.Clear();
+        SoundManager.Play(SoundType.CANDLE_OFF);
     }
 
     public void AddInupt(Candle candle)
