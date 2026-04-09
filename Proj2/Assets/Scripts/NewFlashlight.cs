@@ -27,12 +27,14 @@ public class NewFlashlight : MonoBehaviour
             {
                 ON.SetActive(false);
                 OFF.SetActive(true);
+                SoundManager.Play(SoundType.FLASHLIGHT_ON);
             }
 
             else
             {
                 ON.SetActive(true);
                 OFF.SetActive(false);
+                SoundManager.Play(SoundType.FLASHLIGHT_OFF);
             }
 
             isON = !isON;

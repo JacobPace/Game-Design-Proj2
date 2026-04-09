@@ -40,5 +40,6 @@ public class TimerCandle : MonoBehaviour
         {
             candleLight.enabled = false;
         }
+        SoundManager.Play(SoundType.CANDLE_OFF);
     }
 }
