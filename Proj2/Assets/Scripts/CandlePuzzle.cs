@@ -8,7 +8,7 @@ public class CandlePuzzle : MonoBehaviour
     public List<Candle> correctOrder = new();
     private readonly List<Candle> playerInput = new();
 
-    public GameObject escapeDoor;
+    public DrawerAnimation drawerScript;
 
     public void CheckPuzzle()
     {
@@ -26,7 +26,9 @@ public class CandlePuzzle : MonoBehaviour
         // remove debug in post
         Debug.Log("Puzzle Complete!!!!!!!!!!!!!!!");
         // puzzle is complete, do stuff
-        Destroy(escapeDoor);
+        if (drawerScript != null) {
+            drawerScript.OpenDrawer();
+        }
     }
 
     public void ResetPuzzle()
