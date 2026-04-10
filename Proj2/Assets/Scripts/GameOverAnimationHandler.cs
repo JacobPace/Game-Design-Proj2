@@ -14,5 +14,7 @@ public class GameOverAnimationHandler : MonoBehaviour
     public void EnableCanvas()
     {
         canvas.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }
