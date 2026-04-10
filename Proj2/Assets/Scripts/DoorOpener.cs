@@ -9,11 +9,13 @@ public class DoorOpener : MonoBehaviour
     private bool isOpen = false;
     private Quaternion closedRotation;
     private Quaternion openRotation;
+    private Collider doorCollider;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         closedRotation = transform.rotation;
         openRotation = Quaternion.Euler(transform.eulerAngles + new Vector3(0f, openAngle, 0f));
+        doorCollider = GetComponent<Collider>();
     }
 
     // Update is called once per frame
@@ -32,6 +34,8 @@ public class DoorOpener : MonoBehaviour
     public void OpenDoor()
     {
         isOpen = true;
+        if (doorCollider != null)
+            doorCollider.enabled = false;
         Debug.Log("Door Opened");
     }
 }

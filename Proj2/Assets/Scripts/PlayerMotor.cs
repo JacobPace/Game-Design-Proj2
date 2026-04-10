@@ -89,6 +89,7 @@ public class PlayerMotor : MonoBehaviour
     private void HandleLook()
     {
         if (PlayerInput.Instance == null) return;
+        if (Time.timeScale == 0) return;
 
         Vector2 look = PlayerInput.Instance.input.Look.ReadValue<Vector2>();
 

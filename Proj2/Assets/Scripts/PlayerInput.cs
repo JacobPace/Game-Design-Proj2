@@ -17,6 +17,7 @@ public class PlayerInput : MonoBehaviour
     private void OnDestroy()
     {
         controls?.Dispose();
+        if (Instance == this) Instance = null; 
     }
 
     public void DisableInput()

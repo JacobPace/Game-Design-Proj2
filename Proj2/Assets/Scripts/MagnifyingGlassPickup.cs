@@ -1,20 +1,32 @@
 using UnityEngine;
 
-public class MagnifyingGlassPick : MonoBehaviour, IInteractable
+public class MagnifyingGlassPickup : MonoBehaviour, IInteractable
 {
     [SerializeField] private BedroomPuzzleManager puzzleManager;
+    [SerializeField] private ParticleSystem pickupEffect;
+
+    void Awake()
+    {
+        if (puzzleManager == null)
+            puzzleManager = FindFirstObjectByType<BedroomPuzzleManager>();
+    }
 
     public void Interact()
     {
-        Debug.Log("Magnifying glass interacted!");
         if (puzzleManager == null)
         {
-            Debug.LogError("MagnifyingGlassPickup: puzzleManager is not assigned.");
+            Debug.LogError("MagnifyingGlassPickup: puzzleManager not assigned.");
             return;
         }
 
+        if (puzzleManager.HasMagnifyingGlass) return;
+
+        if (pickupEffect != null)
+            pickupEffect.Play();
+
         puzzleManager.CollectMagnifyingGlass();
-        gameObject.SetActive(false);
+
+        GetComponent<Renderer>()?.gameObject.SetActive(false);
+        Destroy(gameObject, 0.5f);
     }
 }
-
